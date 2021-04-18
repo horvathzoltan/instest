@@ -49,7 +49,10 @@ public:
     //static UploadR Upload(const QString& fn);
     static QString GetDriverName();
     static QFileInfo GetMostRecent(const QString &path, const QString &pattern);
+    static QString GetUrl(int i1, int i2, int p);
 
+    static QStringList GetIp(int i1, int i2, int p);
+    static void FilterLocalIp(QStringList *l);
 //    static int setCamSettings(const QString& s, int i);
 //    static int brightnest_p();
 //    static int brightnest_m();
@@ -69,5 +72,5 @@ private:
 //    static int UploadNext(const QString& key);
 };
 
-static QString GetIp(int i1, int i2, int p);
+
 #endif // CAMTEST_H

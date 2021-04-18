@@ -8,9 +8,10 @@
 #include <QSqlQuery>
 #include "common/logger/log.h"
 #include <QUrl>
+#include <QNetworkInterface>
 
 //QString Camtest::CamIp = QStringLiteral("http://172.16.3.103:1997");
-QUrl Instest::CamUrl = QUrl(QStringLiteral("http://10.10.10.151:8080"));
+QUrl Instest::CamUrl;// = QUrl(QStringLiteral("http://10.10.10.151:8080"));
 com::helper::Downloader Instest::_d(CamUrl.toString());
 Instest::InsSettings Instest::_camSettings;
 // ping cél ip
@@ -116,12 +117,53 @@ QFileInfo Instest::GetMostRecent(const QString& path, const QString& pattern)
 /*
 nmap -Pn -p22 --open 10.10.10.100-130
 Nmap scan report for\s+(?:\S+\s+)?\(?([0-9\.]+)\)?
-
 */
+QStringList Instest::GetIp(int i1, int i2, int p)
+{
+    if(i1<1||i1>255) return {};
+    if(i2<1||i2>255) return {};
+    if(i1>i2) return {};
+    if(p<1||p>UINT16_MAX) return {};
+
+    auto cmd = QStringLiteral(R"(nmap -Pn -p%3 --open 10.10.10.%1-%2)").arg(i1).arg(i2).arg(p);
+    auto out = com::helper::ProcessHelper::Execute(cmd);
+    if(out.exitCode) return {};
+
+    static const QRegularExpression r(R"(Nmap scan report for\s+(?:\S+\s+)?\(?([0-9\.]+)\)?)");
+    auto mi = r.globalMatch(out.stdOut);
+
+    QStringList e;
+    while (mi.hasNext())
+    {
+        auto a = mi.next().captured(1);
+        e.append(a);
+    }
+
+    return e;
+}
+
+void Instest::FilterLocalIp(QStringList *l)
+{
+    auto lip = QNetworkInterface::allAddresses();
+
+    for(auto&i:lip) l->removeAll(i.toString());
+}
+
+
 
 Instest::StartR Instest::Start(){
-   // QString
-    QString cam_ip = CamUrl.host();//QStringLiteral("172.16.3.103"); //beallitasok(ip)
+    int cam_p = 8080;
+    auto iplist=GetIp(100,155,cam_p);
+    FilterLocalIp(&iplist);
+
+    QString cam_ip;
+
+    if(iplist.count()>0) cam_ip= iplist[0];
+    else cam_ip=QStringLiteral("10.10.10.151");//CamUrl.host();//QStringLiteral("172.16.3.103"); //beallitasok(ip)
+
+    CamUrl = QUrl(QStringLiteral("http://%1:%2").arg(cam_ip).arg(cam_p));
+
+
     QString driver = "QODBC";//"QODBC";
     QString dbname = "BuildInfoFlex";
     QString dbhost = "172.16.1.5";//:1433";
