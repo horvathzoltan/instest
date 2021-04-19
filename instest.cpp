@@ -12,8 +12,9 @@
 
 //QString Camtest::CamIp = QStringLiteral("http://172.16.3.103:1997");
 QUrl Instest::CamUrl;// = QUrl(QStringLiteral("http://10.10.10.151:8080"));
-com::helper::Downloader Instest::_d(CamUrl.toString());
+com::helper::Downloader* Instest::_d = nullptr;//(CamUrl.toString());
 Instest::InsSettings Instest::_camSettings;
+QList<Instest::InsoleType> Instest::_insoletypes;
 // ping cél ip
 // ha ok, akkor arp -a cél ip -> mac addr
 // ha ismeretlen mac
@@ -163,6 +164,8 @@ Instest::StartR Instest::Start(){
 
     CamUrl = QUrl(QStringLiteral("http://%1:%2").arg(cam_ip).arg(cam_p));
 
+    if(_d) delete _d;
+    _d = new com::helper::Downloader(CamUrl.toString());
 
     QString driver = "QODBC";//"QODBC";
     QString dbname = "BuildInfoFlex";
@@ -241,6 +244,29 @@ Instest::StartR Instest::Start(){
 
                 }
             }
+
+            static const QString cmd2 = QStringLiteral("SELECT id,Name,R,VMax,VMin FROM MasterMove_UWPClient.hw.InsoleTypes").arg(mac);
+            db_ok = query.exec(cmd2);
+            if(db_ok)
+            {
+                rows = 0;
+                while(query.next()){
+                    rows++;
+                    InsoleType a
+                    {
+                        query.value(0).toInt(),
+                        query.value(1).toString(),
+                        query.value(2).toInt(),
+                        query.value(4).toInt(),
+                        query.value(3).toInt()
+                    };
+                    _insoletypes.append(a);
+                }
+                if(!rows)
+                {
+                    dberr+="no insoletypes\n";
+                }
+            }
         }
 
         if(!db_ok)
@@ -249,7 +275,6 @@ Instest::StartR Instest::Start(){
             dberr = a.text().trimmed();
         }
         db.close();
-
 
         append_value(&msg, db_ok);
         append_value(&msg, dberr);
@@ -260,6 +285,16 @@ Instest::StartR Instest::Start(){
     QSqlDatabase::removeDatabase("conn1");
 
     return {msg, serial, isActive, _camSettings};
+}
+
+Instest::InsoleType Instest::GetInsoleType(int v)
+{
+    for(auto&i:_insoletypes)
+    {
+        if(i.min<=v && v<=i.max)
+            return i;
+    }
+    return {};
 }
 
 bool Instest::Ping(const QString& ip, int port){

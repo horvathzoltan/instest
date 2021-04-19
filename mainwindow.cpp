@@ -35,9 +35,27 @@ void MainWindow::on_radioButton_stop_clicked()
 void MainWindow::on_timer_timeout()
 {
     auto p = Instest::GetData();
-    if(!p.isNull())
+    if(!p.isEmpty())
     {        
-        ui->label_pic->setText(p);//setPixmap(p);
+        QString str;
+        auto b = p.split(';');
+        bool isok;
+        auto v = b[0].toInt(&isok);
+        if(isok)
+        {
+            Instest::InsoleType i = Instest::GetInsoleType(v);
+            if(i.id>0)
+            {
+                str=i.name + ' '+"R="+QString::number(i.r)+"Ω";
+            }
+        }
+        else{
+            str = "no insole check";
+        }
+        if(!str.isEmpty()) str+= '\n';
+        str+=p;
+        ui->label_pic->setText(str);//setPixmap(p);
+
     }
     else
     {
@@ -51,7 +69,7 @@ void MainWindow::setUi(const Instest::StartR& m){
     ui->label_serial->setText(m.serial);
     if(_camera_active)
     {
-        timer->start(20);
+        timer->start(100);
         //if(Instest::OpenCamera()) timer->start(10);
     }
     setLabelB(m._settings.brightnest);

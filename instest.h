@@ -10,6 +10,19 @@
 class Instest
 {
 public:
+    /*
+INSERT INTO CPU.hw.InsoleTypes (Id,LastModified,Name,InsoleGenderId,InsoleAgeCategoryId,InsoleSideId,EUSize,GeometryCSV,R,VMax,VMin) VALUES
+     (1,'2020-02-08 14:15:00.000','42Jobb',1,2,3,42.0,'""',390,53,46);
+*/
+    struct InsoleType
+    {
+        int id;
+        QString name;
+        int r;
+        int min;
+        int max;
+    };
+
     struct InsSettings{
         int brightnest;
         int contrast;
@@ -18,7 +31,7 @@ public:
         int wb;
     };
 
-    static com::helper::Downloader _d;
+    static com::helper::Downloader* _d;
     static QUrl CamUrl;
 
     struct StartR{
@@ -29,6 +42,7 @@ public:
     };
 
 
+    static QList<InsoleType> _insoletypes;
     static InsSettings _camSettings;
     static StartR Start();
     struct StopR{};
@@ -36,8 +50,14 @@ public:
     static QString NewSerial(const QSqlDatabase &db);
     static bool Ping(const QString &ip, int port=-1);
 
+
     //static bool OpenCamera(){return Instest::_d.download("set_cam_open", "")=="ok";}
-    static bool ActiveCamera(){return Instest::_d.download("active", "")=="active";}
+    static bool ActiveCamera()
+    {
+        auto a = Instest::_d->download("active", "");
+        auto b = a=="active";
+        return b;
+    }
     //static bool GetCamSettings();
     //static bool CloseCamera(){return Instest::_d.download("set_cam_close", "")=="ok";}
     //static QPixmap GetPixmap();
@@ -63,9 +83,10 @@ public:
 //    static int gain_p();
 //    static int gain_m();
 //    static int wb_p();
-//    static int wb_m();
+    //    static int wb_m();
+    static Instest::InsoleType GetInsoleType(int v);
 private:
-    static QByteArray _GetData(){return Instest::_d.download("get_data", "");}
+    static QByteArray _GetData(){return Instest::_d->download("get_data", "");}
 
 //    static QString UploadMetaData(const QString& fn, int len);
 //    static void UploadData(const QString& key, const QByteArray& a);
