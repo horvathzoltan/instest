@@ -24,11 +24,11 @@ INSERT INTO CPU.hw.InsoleTypes (Id,LastModified,Name,InsoleGenderId,InsoleAgeCat
     };
 
     struct InsSettings{
-        int brightnest;
-        int contrast;
-        int saturation;
-        int gain;
-        int wb;
+//        int brightnest;
+//        int contrast;
+//        int saturation;
+//        int gain;
+//        int wb;
     };
 
     static com::helper::Downloader* _d;
@@ -38,6 +38,7 @@ INSERT INTO CPU.hw.InsoleTypes (Id,LastModified,Name,InsoleGenderId,InsoleAgeCat
         QString msg;
         QString serial;
         bool isActive;
+        QString version;
         InsSettings _settings;
     };
 
@@ -50,18 +51,48 @@ INSERT INTO CPU.hw.InsoleTypes (Id,LastModified,Name,InsoleGenderId,InsoleAgeCat
     static QString NewSerial(const QSqlDatabase &db);
     static bool Ping(const QString &ip, int port=-1);
 
-
-    //static bool OpenCamera(){return Instest::_d.download("set_cam_open", "")=="ok";}
-    static bool ActiveCamera()
+    static bool DeviceUpdateStorageStatus()
     {
+        auto a = Instest::_d->download("get_storage_status", "");
+        return a.startsWith("ok");
+    }
+
+    static bool DeviceMountStorage()
+    {
+        auto a = Instest::_d->download("set_storage_mount", "");
+        return a.startsWith("ok");
+    }
+    //static bool OpenCamera(){return Instest::_d.download("set_cam_open", "")=="ok";}
+    static bool DeviceActive()
+    {
+        if(!Instest::_d) return false;
         auto a = Instest::_d->download("active", "");
         auto b = a=="active";
         return b;
     }
+
+    static QString DeviceVersion()
+    {
+        auto a = Instest::_d->download("version", "");
+        return a;
+    }
+
+    static QString DeviceBatt()
+    {
+        auto a = Instest::_d->download("get_batt", "");
+        return a;
+    }
+
+    static QString DeviceUpdate()
+    {
+        auto a = Instest::_d->download("update", "");
+        return a;
+    }
+
     //static bool GetCamSettings();
     //static bool CloseCamera(){return Instest::_d.download("set_cam_close", "")=="ok";}
     //static QPixmap GetPixmap();
-    static QString GetData();
+    static QString DeviceGetData();
     struct UploadR
     {
         QString err;
@@ -85,8 +116,16 @@ INSERT INTO CPU.hw.InsoleTypes (Id,LastModified,Name,InsoleGenderId,InsoleAgeCat
 //    static int wb_p();
     //    static int wb_m();
     static Instest::InsoleType GetInsoleType(int v);
+
+    struct UpdateR
+    {
+      bool isOk;
+      QString msg;
+    };
+
+    static Instest::UpdateR Update();
 private:
-    static QByteArray _GetData(){return Instest::_d->download("get_data", "");}
+    static QByteArray _DeviceGetData(){return Instest::_d->download("get_data", "");}
 
 //    static QString UploadMetaData(const QString& fn, int len);
 //    static void UploadData(const QString& key, const QByteArray& a);

@@ -9,6 +9,7 @@
 #include "common/logger/log.h"
 #include <QUrl>
 #include <QNetworkInterface>
+#include <QThread>
 
 //QString Camtest::CamIp = QStringLiteral("http://172.16.3.103:1997");
 QUrl Instest::CamUrl;// = QUrl(QStringLiteral("http://10.10.10.151:8080"));
@@ -173,15 +174,17 @@ Instest::StartR Instest::Start(){
     QString user = "sa";
     QString password= "Gtr7jv8fh2";
 
-    if(!Ping(cam_ip)) return {"cannot ping insole at "+cam_ip, "", 0, {}};
-    auto isActive = ActiveCamera();
+    if(!Ping(cam_ip)) return {"cannot ping insole at "+cam_ip, "", 0, "",{}};
+    auto isActive = DeviceActive();
+    auto version = DeviceVersion();
+    auto batt = DeviceBatt();
     //GetCamSettings();
 
     auto cmd = QStringLiteral(R"(arp -a -n %1)").arg(cam_ip);
     auto out = com::helper::ProcessHelper::Execute(cmd);
-    if(out.exitCode!=0) return {"arp error", "", 0, _camSettings};
+    if(out.exitCode!=0) return {"arp error", "", 0, version, _camSettings};
     // ? (172.16.3.235) at dc:a6:32:74:92:dd [ether] on enp4s0
-    if(out.stdOut.isEmpty()) return {"no arp output", "", 0, {}};
+    if(out.stdOut.isEmpty()) return {"no arp output", "", 0, version,{}};
 
     QString& x = out.stdOut;
     QRegularExpression re(QStringLiteral(R"(at\s+((?:[0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2})\s+)"));
@@ -208,7 +211,7 @@ Instest::StartR Instest::Start(){
 
         int port = 1433;
         auto driverfn = GetDriverName();
-        if(driverfn.isEmpty()) return {"no db driver error", "", 0, _camSettings};
+        if(driverfn.isEmpty()) return {"no db driver error", "", 0, version,_camSettings};
         db.setDatabaseName(QStringLiteral("DRIVER=%1;Server=%2,%3;Database=%4").arg(driverfn).arg(dbhost).arg(port).arg(dbname));
 
 
@@ -281,10 +284,12 @@ Instest::StartR Instest::Start(){
         append_value(&msg, isNew);
         append_value(&msg, serial);
         append_value(&msg, rows);
+        append_value(&msg, version);
+        append_value(&msg, batt);
     }
     QSqlDatabase::removeDatabase("conn1");
 
-    return {msg, serial, isActive, _camSettings};
+    return {msg, serial, isActive, version, _camSettings};
 }
 
 Instest::InsoleType Instest::GetInsoleType(int v)
@@ -295,6 +300,47 @@ Instest::InsoleType Instest::GetInsoleType(int v)
             return i;
     }
     return {};
+}
+
+Instest::UpdateR Instest::Update()
+{
+    QString msg;
+
+    auto a = DeviceActive();
+    if(!a)
+    {
+        com::helper::StringHelper::AppendLine(&msg, "not active");
+        return {false, msg};
+    }
+
+    auto v_old = DeviceVersion();
+
+    append_value(&msg, v_old);
+
+    auto updstatus = DeviceUpdateStorageStatus();
+    if(!updstatus) updstatus=DeviceMountStorage();
+    if(!updstatus){
+        com::helper::StringHelper::AppendLine(&msg, "cannot mount");
+        return {false, msg};
+    }
+
+    DeviceUpdate();
+
+    int i;
+    QString v_new;
+    bool isok;
+    for(i=0;i<10;i++)
+    {
+        QThread::sleep(3);
+        v_new = DeviceVersion();
+        isok = v_new!=v_old;
+        if(isok) break;
+    }
+
+    append_value(&msg, v_new);
+    append_value(&msg, i);
+
+    return {isok, msg};
 }
 
 bool Instest::Ping(const QString& ip, int port){
@@ -335,9 +381,9 @@ QString Instest::NewSerial(const QSqlDatabase& db){
 
 Instest::StopR Instest::Stop(){return {};}
 
-QString Instest::GetData()
+QString Instest::DeviceGetData()
 {
-     return Instest::_GetData();
+     return Instest::_DeviceGetData();
 
 ////    QPixmap p;
 //    if(b.length()>100) p.loadFromData(b,"JPG");

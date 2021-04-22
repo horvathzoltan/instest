@@ -18,11 +18,11 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void setLabelB(int i);
-    void setLabelC(int i);
-    void setLabelS(int i);
-    void setLabelG(int i);
-    void setLabelWB(int i);
+//    void setLabelB(int i);
+//    void setLabelC(int i);
+//    void setLabelS(int i);
+//    void setLabelG(int i);
+//    void setLabelWB(int i);
 private slots:
     void on_radioButton_start_clicked();
 
@@ -50,6 +50,8 @@ private slots:
 
 //    void on_pushButton_wbm_clicked();
 
+    void on_pushButton_update_clicked();
+
 private:
     Ui::MainWindow *ui;
     QTimer *timer;
@@ -57,5 +59,6 @@ private:
     void setUi(const Instest::StartR&);
     void setUi(const Instest::StopR&);
     void setUi(const Instest::UploadR &m);
+    void setUi(const Instest::UpdateR &m);
 };
 #endif // MAINWINDOW_H

@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "instest.h"
 #include "common/macrofactory/macro.h"
+#include "common/helper/string/stringhelper.h"
 //#include "common/helper/downloader/downloader.h"
 #include <QTimer>
 
@@ -34,10 +35,12 @@ void MainWindow::on_radioButton_stop_clicked()
 
 void MainWindow::on_timer_timeout()
 {
-    auto p = Instest::GetData();
+    auto p = Instest::DeviceGetData();
+    auto b = Instest::DeviceBatt();
+    QString str;
+
     if(!p.isEmpty())
-    {        
-        QString str;
+    {                
         auto b = p.split(';');
         bool isok;
         auto v = b[0].toInt(&isok);
@@ -49,18 +52,19 @@ void MainWindow::on_timer_timeout()
                 str=i.name + ' '+"R="+QString::number(i.r)+"Ω";
             }
         }
-        else{
+        else
+        {
             str = "no insole check";
         }
-        if(!str.isEmpty()) str+= '\n';
-        str+=p;
-        ui->label_pic->setText(str);//setPixmap(p);
 
+        com::helper::StringHelper::AppendLine(&str, p);
     }
-    else
+
+    if(!b.isEmpty())
     {
-        ui->label_pic->setText("upsz");
+        com::helper::StringHelper::AppendLine(&str, QString("batt:%1").arg(b));
     }
+    ui->label_pic->setText(str);
 }
 
 void MainWindow::setUi(const Instest::StartR& m){
@@ -72,10 +76,10 @@ void MainWindow::setUi(const Instest::StartR& m){
         timer->start(100);
         //if(Instest::OpenCamera()) timer->start(10);
     }
-    setLabelB(m._settings.brightnest);
-    setLabelC(m._settings.contrast);
-    setLabelS(m._settings.saturation);
-    setLabelG(m._settings.gain);
+//    setLabelB(m._settings.brightnest);
+//    setLabelC(m._settings.contrast);
+//    setLabelS(m._settings.saturation);
+//    setLabelG(m._settings.gain);
 }
 
 void MainWindow::setUi(const Instest::StopR& m){
@@ -106,11 +110,11 @@ void MainWindow::setUi(const Instest::UploadR& m){
     ui->label_pic->setText(m.err);    
 }
 
-void MainWindow::setLabelB(int i){ ui->label_b->setText(QString::number(i));}
-void MainWindow::setLabelC(int i){ ui->label_c->setText(QString::number(i));}
-void MainWindow::setLabelS(int i){ ui->label_s->setText(QString::number(i));}
-void MainWindow::setLabelG(int i){ ui->label_g->setText(QString::number(i));}
-void MainWindow::setLabelWB(int i){ ui->label_wb->setText(QString::number(i));}
+//void MainWindow::setLabelB(int i){ ui->label_b->setText(QString::number(i));}
+//void MainWindow::setLabelC(int i){ ui->label_c->setText(QString::number(i));}
+//void MainWindow::setLabelS(int i){ ui->label_s->setText(QString::number(i));}
+//void MainWindow::setLabelG(int i){ ui->label_g->setText(QString::number(i));}
+//void MainWindow::setLabelWB(int i){ ui->label_wb->setText(QString::number(i));}
 
 //void MainWindow::on_pushButton_bp_clicked()
 //{
@@ -161,3 +165,13 @@ void MainWindow::setLabelWB(int i){ ui->label_wb->setText(QString::number(i));}
 //{
 //    setLabelWB(Camtest::wb_m());
 //}
+
+void MainWindow::on_pushButton_update_clicked()
+{
+    setUi(Instest::Update());
+}
+
+void MainWindow::setUi(const Instest::UpdateR& m){
+
+    ui->label_msg->setText((m.isOk?"ok\n":"error\n")+m.msg);
+}
