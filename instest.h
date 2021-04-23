@@ -53,39 +53,45 @@ INSERT INTO CPU.hw.InsoleTypes (Id,LastModified,Name,InsoleGenderId,InsoleAgeCat
 
     static bool DeviceUpdateStorageStatus()
     {
-        auto a = Instest::_d->download("get_storage_status", "");
+        if(!_d) return false;
+        auto a = _d->download("get_storage_status", "");
         return a.startsWith("ok");
     }
 
     static bool DeviceMountStorage()
     {
-        auto a = Instest::_d->download("set_storage_mount", "");
+        if(!_d) return false;
+        auto a = _d->download("set_storage_mount", "");
         return a.startsWith("ok");
     }
     //static bool OpenCamera(){return Instest::_d.download("set_cam_open", "")=="ok";}
     static bool DeviceActive()
     {
-        if(!Instest::_d) return false;
-        auto a = Instest::_d->download("active", "");
+        if(!_d) return false;
+        auto a = _d->download("active", "");
         auto b = a=="active";
         return b;
     }
 
-    static QString DeviceVersion()
+    static QString DeviceBatt()
     {
-        auto a = Instest::_d->download("version", "");
+        if(!_d) return nullptr;
+        auto a = _d->download("get_batt", "");
         return a;
     }
 
-    static QString DeviceBatt()
+
+    static QString DeviceVersion()
     {
-        auto a = Instest::_d->download("get_batt", "");
+        if(!_d) return nullptr;
+        auto a = _d->download("version", "");
         return a;
     }
 
     static QString DeviceUpdate()
     {
-        auto a = Instest::_d->download("update", "");
+        if(!_d) return nullptr;
+        auto a = _d->download("update", "");
         return a;
     }
 

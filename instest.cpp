@@ -328,11 +328,12 @@ Instest::UpdateR Instest::Update()
 
     int i;
     QString v_new;
-    bool isok;
+    bool isok;        
     for(i=0;i<10;i++)
     {
         QThread::sleep(3);
         v_new = DeviceVersion();
+        if(v_new.isEmpty()) continue;
         isok = v_new!=v_old;
         if(isok) break;
     }
@@ -358,7 +359,7 @@ bool Instest::Ping(const QString& ip, int port){
 //    if(a.isEmpty()) return false;
 //    auto b = a.split(';');
 //    if(b.length()<5) return false;
-//    bool isok;
+//    bool isok;nmap -Pn -p%3 --open 10.10.10.%1-%2
 //    _camSettings.brightnest=b[0].toInt(&isok);
 //    _camSettings.contrast=b[1].toInt(&isok);
 //    _camSettings.saturation=b[2].toInt(&isok);
