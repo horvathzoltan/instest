@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &MainWindow::on_timer_timeout);
+    connect(timer, &QTimer::timeout, this, &MainWindow::on_timerTimeout);
 }
 
 MainWindow::~MainWindow()
@@ -33,7 +33,7 @@ void MainWindow::on_radioButton_stop_clicked()
     setUi(m);
 }
 
-void MainWindow::on_timer_timeout()
+void MainWindow::on_timerTimeout()
 {
     auto p = Instest::DeviceGetData();
     auto b = Instest::DeviceBatt();
@@ -168,10 +168,11 @@ void MainWindow::setUi(const Instest::UploadR& m){
 
 void MainWindow::on_pushButton_update_clicked()
 {
+    ui->label_msg->setText("Waiting for update...");
     setUi(Instest::Update());
 }
 
 void MainWindow::setUi(const Instest::UpdateR& m){
 
-    ui->label_msg->setText((m.isOk?"ok\n":"error\n")+m.msg);
+    ui->label_msg->setText(QStringLiteral("Update ")+(m.isOk?"ok\n":"error\n")+m.msg);
 }

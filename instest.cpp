@@ -338,6 +338,8 @@ Instest::UpdateR Instest::Update()
         if(isok) break;
     }
 
+    if(i>10) msg+="Timeout\n";
+
     append_value(&msg, v_new);
     append_value(&msg, i);
 

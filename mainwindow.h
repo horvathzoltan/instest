@@ -25,9 +25,10 @@ public:
 //    void setLabelWB(int i);
 private slots:
     void on_radioButton_start_clicked();
-
     void on_radioButton_stop_clicked();
-    void on_timer_timeout();
+    void on_timerTimeout();
+    void on_pushButton_update_clicked();
+
     //void on_pushButton_upload_clicked();
 
 //    void on_pushButton_bp_clicked();
@@ -50,7 +51,6 @@ private slots:
 
 //    void on_pushButton_wbm_clicked();
 
-    void on_pushButton_update_clicked();
 
 private:
     Ui::MainWindow *ui;
