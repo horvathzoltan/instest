@@ -176,3 +176,17 @@ void MainWindow::setUi(const Instest::UpdateR& m){
 
     ui->label_msg->setText(QStringLiteral("Update ")+(m.isOk?"ok\n":"error\n")+m.msg);
 }
+
+void MainWindow::on_pushButton_shutdown_clicked()
+{
+    ui->label_msg->setText("Waiting for shutdown...");
+    setUi(Instest::Shutdown());
+}
+
+void MainWindow::setUi(const Instest::ShutdownR& m){
+
+    ui->label_msg->setText(QStringLiteral("Shutdown ")+(m.isOk?"ok\n":"error\n")+m.msg);
+    ui->radioButton_stop->setChecked(true);
+}
+
+

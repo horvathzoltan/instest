@@ -449,3 +449,34 @@ QString Instest::DeviceGetData()
 //    int ix = b.toInt(&ok);
 //    return ok?ix:-2;
 //}
+
+Instest::ShutdownR Instest::Shutdown()
+{
+    QString msg;
+
+    auto a = DeviceActive();
+    if(!a)
+    {
+        com::helper::StringHelper::AppendLine(&msg, "not active");
+        return {false, msg};
+    }
+
+    DeviceShutdown();
+
+    int i;
+    bool ping;
+
+    auto host = CamUrl.host();
+    for(i=0;i<10;i++)
+    {
+        QThread::sleep(3);
+        ping = Ping(host);
+        if(!ping) break;
+    }
+
+    if(i>10) msg+="Timeout\n";
+
+    //append_value(&msg, i);
+
+    return {!ping, msg};
+}

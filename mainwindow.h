@@ -52,6 +52,8 @@ private slots:
 //    void on_pushButton_wbm_clicked();
 
 
+    void on_pushButton_shutdown_clicked();
+
 private:
     Ui::MainWindow *ui;
     QTimer *timer;
@@ -60,5 +62,6 @@ private:
     void setUi(const Instest::StopR&);
     void setUi(const Instest::UploadR &m);
     void setUi(const Instest::UpdateR &m);
+    void setUi(const Instest::ShutdownR &m);
 };
 #endif // MAINWINDOW_H

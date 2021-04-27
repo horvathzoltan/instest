@@ -95,6 +95,13 @@ INSERT INTO CPU.hw.InsoleTypes (Id,LastModified,Name,InsoleGenderId,InsoleAgeCat
         return a;
     }
 
+    static QString DeviceShutdown()
+    {
+        if(!_d) return nullptr;
+        auto a = _d->download("shutdown", "");
+        return a;
+    }
+
     //static bool GetCamSettings();
     //static bool CloseCamera(){return Instest::_d.download("set_cam_close", "")=="ok";}
     //static QPixmap GetPixmap();
@@ -130,6 +137,14 @@ INSERT INTO CPU.hw.InsoleTypes (Id,LastModified,Name,InsoleGenderId,InsoleAgeCat
     };
 
     static Instest::UpdateR Update();
+
+    struct ShutdownR
+    {
+      bool isOk;
+      QString msg;
+    };
+    static Instest::ShutdownR Shutdown();
+
 private:
     static QByteArray _DeviceGetData(){return Instest::_d->download("get_data", "");}
 
