@@ -22,7 +22,9 @@ public:
 //    void setLabelC(int i);
 //    void setLabelS(int i);
 //    void setLabelG(int i);
-//    void setLabelWB(int i);
+    //    void setLabelWB(int i);
+    void SetValues(const QVarLengthArray<int> &values);
+    void ClrValues();
 private slots:
     void on_radioButton_start_clicked();
     void on_radioButton_stop_clicked();

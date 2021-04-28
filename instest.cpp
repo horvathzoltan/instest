@@ -390,7 +390,7 @@ QString Instest::DeviceGetData()
 
 ////    QPixmap p;
 //    if(b.length()>100) p.loadFromData(b,"JPG");
-//    return p;
+//    return p;640
 }
 
 //Camtest::UploadR Camtest::Upload(const QString& fn)

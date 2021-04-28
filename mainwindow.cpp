@@ -6,13 +6,15 @@
 //#include "common/helper/downloader/downloader.h"
 #include <QTimer>
 
+#define CHNUM 16
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &MainWindow::on_timerTimeout);
+    connect(timer, &QTimer::timeout, this, &MainWindow::on_timerTimeout);    
 }
 
 MainWindow::~MainWindow()
@@ -35,36 +37,64 @@ void MainWindow::on_radioButton_stop_clicked()
 
 void MainWindow::on_timerTimeout()
 {
-    auto p = Instest::DeviceGetData();
+    auto data_txt = Instest::DeviceGetData();
     auto b = Instest::DeviceBatt();
-    QString str;
+    //QString str;
 
-    if(!p.isEmpty())
+    QString insoletype_txt;
+    QString batt_txt;
+    QString status_txt;
+    //QString data_txt;
+    QVarLengthArray<int> values(CHNUM);
+
+
+    if(!data_txt.isEmpty())
     {                
-        auto b = p.split(';');
-        bool isok;
-        auto v = b[0].toInt(&isok);
-        if(isok)
+        auto b = data_txt.split(';');
+        //values.clear();
+
+        int chnum = b.length();
+        if(CHNUM<chnum) chnum = CHNUM;
+
+        bool isok_all = true;
+        for(int i=0;i<b.length();i++)
         {
-            Instest::InsoleType i = Instest::GetInsoleType(v);
-            if(i.id>0)
+            bool isok;
+            auto v = b[i].toInt(&isok);
+            values[i] = (isok)?v:0;
+            if(!isok) isok_all=false;
+        }
+
+        //bool isok;
+        //auto v = b[0].toInt(&isok);
+
+        if(isok_all)
+        {            
+            int v = values[0];
+            if(v>1000) insoletype_txt = "no insole connected";
+            else
             {
-                str=i.name + ' '+"R="+QString::number(i.r)+"Ω";
+                Instest::InsoleType i = Instest::GetInsoleType(v);
+                if(i.id>0) insoletype_txt=i.name + ' '+"R="+QString::number(i.r)+"Ω";
+                else insoletype_txt = "unknown insole";
             }
+            status_txt = "data ok";
         }
         else
         {
-            str = "no insole check";
+            status_txt = "data error";
         }
 
-        com::helper::StringHelper::AppendLine(&str, p);
+        SetValues(values);
     }
 
-    if(!b.isEmpty())
-    {
-        com::helper::StringHelper::AppendLine(&str, QString("batt:%1").arg(b));
-    }
-    ui->label_pic->setText(str);
+    if(b.isEmpty()) batt_txt = "no battery status";
+    else batt_txt = "batt:"+b;
+
+    ui->label_pic->setText(data_txt);
+    ui->label_status->setText(status_txt);
+    ui->label_insoletype->setText(insoletype_txt);
+    ui->label_batt->setText(batt_txt);
 }
 
 void MainWindow::setUi(const Instest::StartR& m){
@@ -82,14 +112,71 @@ void MainWindow::setUi(const Instest::StartR& m){
 //    setLabelG(m._settings.gain);
 }
 
-void MainWindow::setUi(const Instest::StopR& m){
+void MainWindow::SetValues(const QVarLengthArray<int>& values)
+{
+    if(values.length()<8) return;
+    ui->progressBar_1->setValue(values[0]);
+    ui->progressBar_2->setValue(values[1]);
+    ui->progressBar_3->setValue(values[2]);
+    ui->progressBar_4->setValue(values[3]);
+
+    ui->progressBar_5->setValue(values[4]);
+    ui->progressBar_6->setValue(values[5]);
+    ui->progressBar_7->setValue(values[6]);
+    ui->progressBar_8->setValue(values[7]);
+
+    if(values.length()<16) return;
+    ui->progressBar_9->setValue(values[8]);
+    ui->progressBar_10->setValue(values[9]);
+    ui->progressBar_11->setValue(values[10]);
+    ui->progressBar_12->setValue(values[11]);
+
+    ui->progressBar_13->setValue(values[12]);
+    ui->progressBar_14->setValue(values[13]);
+    ui->progressBar_15->setValue(values[14]);
+    ui->progressBar_16->setValue(values[15]);
+}
+
+void MainWindow::ClrValues()
+{
+    ui->progressBar_1->setValue(0);
+    ui->progressBar_2->setValue(0);
+    ui->progressBar_3->setValue(0);
+    ui->progressBar_4->setValue(0);
+
+    ui->progressBar_5->setValue(0);
+    ui->progressBar_6->setValue(0);
+    ui->progressBar_7->setValue(0);
+    ui->progressBar_8->setValue(0);
+
+    ui->progressBar_9->setValue(0);
+    ui->progressBar_10->setValue(0);
+    ui->progressBar_11->setValue(0);
+    ui->progressBar_12->setValue(0);
+
+    ui->progressBar_13->setValue(0);
+    ui->progressBar_14->setValue(0);
+    ui->progressBar_15->setValue(0);
+    ui->progressBar_16->setValue(0);
+}
+
+void MainWindow::setUi(const Instest::StopR& m){    
     timer->stop();
-    //ui->label_txt->setText("");
-    //ui->label_serial->setText("");
-    if(_camera_active)
-    {
-        //Instest::CloseCamera();
-    }
+
+    ClrValues();
+
+    ui->label_pic->setText("");
+    ui->label_status->setText("");
+    ui->label_insoletype->setText("");
+    ui->label_batt->setText("");
+
+    ui->label_txt->setText("");
+    ui->label_serial->setText("");
+    ui->label_msg->setText("");
+//    if(_camera_active)
+//    {
+//        //Instest::CloseCamera();
+//    }
 }
 
 
