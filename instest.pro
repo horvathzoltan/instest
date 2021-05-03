@@ -92,11 +92,17 @@ DEPENDPATH += $$HOME/common
 SOURCES += \
     instest.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    networkhelper.cpp \
+    settings.cpp \
+    sqlhelper.cpp
 
 HEADERS += \
     instest.h \
-    mainwindow.h
+    mainwindow.h \
+    networkhelper.h \
+    settings.h \
+    sqlhelper.h
 
 FORMS += \
     mainwindow.ui

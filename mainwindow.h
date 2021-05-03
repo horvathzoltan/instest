@@ -18,11 +18,6 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-//    void setLabelB(int i);
-//    void setLabelC(int i);
-//    void setLabelS(int i);
-//    void setLabelG(int i);
-    //    void setLabelWB(int i);
     void SetValues(const QVarLengthArray<int> &values);
     void ClrValues();
 private slots:
@@ -30,29 +25,6 @@ private slots:
     void on_radioButton_stop_clicked();
     void on_timerTimeout();
     void on_pushButton_update_clicked();
-
-    //void on_pushButton_upload_clicked();
-
-//    void on_pushButton_bp_clicked();
-
-//    void on_pushButton_bm_clicked();
-
-//    void on_pushButton_cp_clicked();
-
-//    void on_pushButton_cm_clicked();
-
-//    void on_pushButton_sm_clicked();
-
-//    void on_pushButton_sp_clicked();
-
-//    void on_pushButton_gp_clicked();
-
-//    void on_pushButton_gm_clicked();
-
-//    void on_pushButton_wbp_clicked();
-
-//    void on_pushButton_wbm_clicked();
-
 
     void on_pushButton_shutdown_clicked();
 
