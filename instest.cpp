@@ -294,7 +294,7 @@ Instest::ShutdownR Instest::Shutdown()
         if(!ping) break;
     }
 
-    if(i>10) msg+="Timeout\n";
+    if(i>10) msg+="Timeout\n"; else QThread::sleep(5);
 
     return {!ping, msg};
 }
