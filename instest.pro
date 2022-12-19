@@ -91,6 +91,7 @@ DEPENDPATH += $$HOME/common
 
 SOURCES += \
     instest.cpp \
+    ipscanner.cpp \
     main.cpp \
     mainwindow.cpp \
     networkhelper.cpp \
@@ -99,6 +100,7 @@ SOURCES += \
 
 HEADERS += \
     instest.h \
+    ipscanner.h \
     mainwindow.h \
     networkhelper.h \
     settings.h \

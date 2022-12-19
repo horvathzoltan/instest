@@ -13,6 +13,8 @@
 #include <QUrl>
 #include <QNetworkInterface>
 #include <QThread>
+#include "ipscanner.h"
+
 
 extern Settings _settings;
 
@@ -53,6 +55,8 @@ QStringList Instest::IpScan(int i1, int i2, int p)
     return e;
 }
 
+
+
 void Instest::FilterLocalIp(QStringList *l)
 {
     auto lip = QNetworkInterface::allAddresses();
@@ -64,7 +68,7 @@ void Instest::FilterLocalIp(QStringList *l)
 
 Instest::StartR Instest::Start(){
     int cam_p = 8080;
-    auto iplist=IpScan(100,155,cam_p);
+    auto iplist=IpScanner::Scan(100,110,cam_p);
     FilterLocalIp(&iplist);
 
     QString cam_ip;

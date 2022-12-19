@@ -111,7 +111,7 @@ INSERT INTO CPU.hw.InsoleTypes (Id,LastModified,Name,InsoleGenderId,InsoleAgeCat
     static QFileInfo GetMostRecent(const QString &path, const QString &pattern);
     static QString GetUrl(int i1, int i2, int p);
 
-    static QStringList IpScan(int i1, int i2, int p);
+    static QStringList IpScan(int i1, int i2, int p);    
     static void FilterLocalIp(QStringList *l);
     static Instest::InsoleType GetInsoleType(int v);
 
